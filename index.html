@@ -1,0 +1,96 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.8.1/dist/js/tabulator.min.js"></script>
+    <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
+    <script type='text/javascript' src="script.js"></script>
+  </head>
+  <body>
+
+    <div id="main_nav" role="navigation" aria-label="Main">
+      <ul class="nav nav-pills">
+        <li class="nav-item">
+          <a class="nav-link active" role=link aria-label="home" href="index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" role=link aria-label="weekly cases" href="cases.html">Weekly Cases</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" role=link aria-label="weekly deaths" href="deaths.html">Weekly Deaths</a>
+        </li>
+      </ul>
+    </div><br>
+    
+
+    <div class="jumbotron">
+      <div role="heading" aria-level="1">
+        <h1 class="display-4">Covid 19 European Map Visualisation Webapp</h1>
+      </div>
+      <p class="lead">This is a webapp that has been designed to give European citizens the ability to visualise the current trends of Coronavirus throughout the continent. Both a map visualisation
+      of the continent and a tabular representation of the data being represented is provided to the user.</p>
+      <hr class="my-4">
+      <p class="lead">
+        <a class="btn btn-primary btn-lg"  role=link aria-label="weekly cases" href="cases.html" role="button">Weekly Cases</a>
+        <a class="btn btn-primary btn-lg" role=link aria-label="weekly deaths" href="deaths.html" role="button">Weekly Deaths</a>
+      </p>
+    </div>
+
+    <div role="heading" aria-level="2">
+      <h2>Guide</h2>
+    </div><br>
+
+    <div role="heading" aria-level="3">
+      <h3>Map Visualisation</h3>
+    </div>
+    
+    <div role="list" aria-label="map instructions">
+      <ul>
+        <li>
+          The map has each country in Europe with colours that correspond 
+          to the metric that is being visualised, for example the new COVID-19 cases
+          in that country per million in that country.   
+        </li>
+        <li>
+          Upon hovering over a coloured country in the map with the cursor, a tooltip 
+          comes up which presents the name of the country and the value that is being represented
+          by the graph.
+        </li>
+      </ul>
+    </div><br>
+
+    <div role="heading" aria-level="3">
+      <h3>Data Table</h3>
+    </div>
+    <div role="list" aria-label="table instructions">
+      <ul>
+        <li>
+          To the right of the map visualisation, there is a table that represents the
+          data being displayed in the map in a tabular format.
+        </li>
+        <li>
+          By clicking on the column headings of the table, you can sort the table by 
+          the values of the column in both ascending and descending order. 
+
+        </li>
+      </ul>
+    </div><br>
+
+    <div role="heading" aria-level="2">
+      <h2>Data Source</h2>
+    </div><br>
+
+    <div>
+      All of the data that is used in this web application comes from the Our World in 
+      Data Coronavirus source data, which is open source for all to use.<br><br>
+      <div heading="link" aria-label="our world in data source data">
+        <a href="https://ourworldindata.org/coronavirus-source-data">The source data can be located here.</a>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS imports -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+  </body>
+</html>

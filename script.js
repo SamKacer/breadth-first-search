@@ -113,16 +113,11 @@ return result;
 
 function updateLineGraph(country){
 
-    console.log(`event for ${country}`);
     // if country not in countries then add it, otherwise remove it
     if(countries.includes(country)) {
-        console.log(`deselecting ${country}, current countries: ${countries}`);
         countries = countries.filter(c => c != country);
-        console.log(`counntries are now ${countries}`)
     } else {
-        console.log(`addin ${country} to ${countries}`)
         countries.push(country);
-        console.log(`counntries are now ${countries}`)
     }
 
     //if no countries selected, just draw dummy line graph

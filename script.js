@@ -15,7 +15,7 @@ var dailyData = {
     "Bosnia and Herzegovina": [1211, 996, 1605, 1541,1728,1332,1275],
 }
 
-var linegraphData = [
+var dummyLinegraphData = [
     ["Monday", 0],
     ["Tuesday", 0],
     ["Wednesday", 0],
@@ -94,44 +94,38 @@ function drawChart() {
 }
 
 
-function updateLineGraph(country, newData){
+// format data for line graph for selected countries  and provided country data
+function formatLinegraphData(){
+    result  = [["Monday"], ["Tuesday"], ["Wednesday"], ["Thursday"], ["Friday"], ["Saturday"], ["Sunday"]];
+countries.forEach(country => {
+countryData = dailyData[country];
+if(countryData == null){
+    countryData = [5784, 4096, 3817, 4935, 5839, 6653, 6602];
+} 
+result.forEach((dayList, i) => {
+    console.log(`country: ${country}, i: ${i}, dayList: ${dayList}`);
+dayList.push(countryData[i]);
+});
+});
+return result;
+}
 
-    // update the data for the row depending on the status of the line graph
+function updateLineGraph(country){
 
-    // if no country has been clicked yet
-    if(countries.length == 0) {
-        countries.push(country)
-        for(var i=0; i< linegraphData.length; i++) {
-            linegraphData[i][1] = newData[i];
-        }
-    }
-
-    // if only one country has been clicked
-    else if(countries.length == 1){
+    // if country not in countries then add it, otherwise remove it
+    if(countries.includes(country)) {
+        countries = countries.filter(c => c != country);
+    } else {
         countries.push(country);
-        for(var i=0; i< linegraphData.length; i++) {
-            linegraphData[i].push(newData[i]);
-        }
     }
-
-    // if two countries have already been selected
-    else {
-        countries.shift(); // remove first country
-        countries.push(country);
-        for(var i=0; i< linegraphData.length; i++) {
-            linegraphData[i].splice(1,1);
-            linegraphData[i].push(newData[i]);
-        }
-    }
-
-
+    var countryData = formatLinegraphData();
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Day of the Week');
     for(var i=0; i<countries.length; i++) {
         data.addColumn('number', countries[i]);
     }
 
-    data.addRows(linegraphData);
+    data.addRows(countryData);
 
     var options = {
         chart: {
@@ -158,7 +152,7 @@ function drawLineGraph() {
       data.addColumn('number', 'None');
       
 
-      data.addRows(linegraphData);
+      data.addRows(dummyLinegraphData);
 
       var options = {
         chart: {
@@ -196,12 +190,7 @@ function drawMap(data) {
             if(country == "XK"){
                 country = "Kosovo";
             }
-
-            d = dailyData[country];
-            if(d == null){
-                d = [5784, 4096, 3817, 4935, 5839, 6653, 6602];
-            } 
-            updateLineGraph(country, d);
+            updateLineGraph(country);
 
             /*
             var str = '<p>' + country + ': ' + perMillion + ' new cases per million';

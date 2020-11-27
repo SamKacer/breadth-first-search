@@ -7,6 +7,8 @@ google.charts.setOnLoadCallback(drawChart);
 
 var isData = false;
 var countries = [];
+// for selection handler
+var lastSelection = null;
 var dailyData = {
     "Albania" : [501, 525, 563, 507, 410, 490, 532],
     "Austria" : [6006, 5704, 3839,9643, 10368, 8962, 7192],
@@ -90,7 +92,7 @@ function drawChart() {
     data = getData();
     drawMap(data);
     drawTable(data);
-    drawLineGraph();
+    drawDummyLineGraph();
 }
 
 
@@ -103,7 +105,6 @@ if(countryData == null){
     countryData = [5784, 4096, 3817, 4935, 5839, 6653, 6602];
 } 
 result.forEach((dayList, i) => {
-    console.log(`country: ${country}, i: ${i}, dayList: ${dayList}`);
 dayList.push(countryData[i]);
 });
 });
@@ -112,12 +113,24 @@ return result;
 
 function updateLineGraph(country){
 
+    console.log(`event for ${country}`);
     // if country not in countries then add it, otherwise remove it
     if(countries.includes(country)) {
+        console.log(`deselecting ${country}, current countries: ${countries}`);
         countries = countries.filter(c => c != country);
+        console.log(`counntries are now ${countries}`)
     } else {
+        console.log(`addin ${country} to ${countries}`)
         countries.push(country);
+        console.log(`counntries are now ${countries}`)
     }
+
+    //if no countries selected, just draw dummy line graph
+    if(countries.length == 0){
+        drawDummyLineGraph();
+        return;
+    }
+    
     var countryData = formatLinegraphData();
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Day of the Week');
@@ -146,7 +159,7 @@ function updateLineGraph(country){
 
 }
 
-function drawLineGraph() {
+function drawDummyLineGraph() {
     var data = new google.visualization.DataTable();
       data.addColumn('string', 'Day of the Week');
       data.addColumn('number', 'None');
@@ -185,20 +198,21 @@ function drawMap(data) {
     // inline function to setup the selection behaviour
     function selectHandler() {
         var selectedItem = geoChart.getSelection()[0];
-        if (selectedItem) {
-            var country = data.getValue(selectedItem.row, 0);
-            if(country == "XK"){
-                country = "Kosovo";
+        if (selectedItem == null) {
+            if(lastSelection == null) {
+                console.log("didnt expect lastSelection to be null");
+                return;
             }
-            updateLineGraph(country);
-
-            /*
-            var str = '<p>' + country + ': ' + perMillion + ' new cases per million';
-            var str2 = '<br> ' + newCases + ' new cases total</p>';
-            div = document.getElementById('output');
-            div.insertAdjacentHTML('beforeend', str + str2);
-            */
+            selectedItem = lastSelection;
+        } else {
+            lastSelection = selectedItem;
         }
+        var country = data.getValue(selectedItem.row, 0);
+        if(country == "XK"){
+            country = "Kosovo";
+        }
+        updateLineGraph(country);
+
     }
 
     google.visualization.events.addListener(geoChart, 'select', selectHandler)

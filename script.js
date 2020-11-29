@@ -7,15 +7,9 @@ google.charts.setOnLoadCallback(drawChart);
 
 var isData = false;
 var countries = [];
-var dailyData = {
-    "Albania" : [501, 525, 563, 507, 410, 490, 532],
-    "Austria" : [6006, 5704, 3839,9643, 10368, 8962, 7192],
-    "Belarus" : [996,983,1038,1057,1098,1167, 1248],
-    "Belgium" : [],
-    "Bosnia and Herzegovina": [1211, 996, 1605, 1541,1728,1332,1275],
-}
-
-var linegraphData = [
+// for selection handler
+var lastSelection = null;
+var dummyLinegraphData = [
     ["Monday", 0],
     ["Tuesday", 0],
     ["Wednesday", 0],
@@ -33,54 +27,13 @@ function getData() {
     data.addColumn('number', 'New Cases (per million)');
     data.addColumn('number', 'New Cases');
 
-    // Temporarily use "fake" data
-    data.addRows([
-        ["Albania",	1225,	3528.0],
-        ["Austria",	5741,	51714.0],
-        ["Belarus",	802,	7587.0],
-        ["Belgium",	2885,	33439.0],
-        ["Bosnia and Herzegovina",	2952,	9688.0],
-        ["Bulgaria",	3302,	22950.0],
-        ["Croatia",	4175,	17140.0],
-        ["Cyprus",	1347,	1180.0],
-        ["Czech Republic",	4389,	47009.0],
-        ["Denmark",	1182,	6848.0],
-        ["Estonia",	915,	1215.0],
-        ["Faroe Islands",	40,	2.0],
-        ["Finland",	309,	1717.0],
-        ["France",	3154,	205894.0],
-        ["Germany",	1575,	131998.0],
-        ["Greece",	1698,	17701.0],
-        ["Hungary",	3244,	31345.0],
-        ["Iceland",	360,	123.0],
-        ["Ireland",	540,	2671.0],
-        ["Isle of Man",	70,	6.0],
-        ["Italy",	4003,	242062.0],
-        [{v: "XK", f:"Kosovo"},	2685,	5191.0],
-        ["Latvia",	1246,	2351.0],
-        ["Liechtenstein",	5375,	205.0],
-        ["Lithuania",	3918,	10668.0],
-        ["Luxembourg",	5511,	3450.0],
-        ["Macedonia",	3494,	7280.0],
-        ["Malta",	1988,	878.0],
-        ["Moldova",	1759,	7097.0],
-        ["Montenegro",	6857,	4307.0],
-        ["Netherlands",	2218,	38013.0],
-        ["Norway",	738,	4001.0],
-        ["Poland",	4478,	169478.0],
-        ["Portugal",	3699,	37726.0],
-        ["Romania",	2920,	56186.0],
-        ["Russia",	1023,	149417.0],
-        ["Serbia",	3005,	20451.0],
-        ["Slovakia",	2179,	11900.0],
-        ["Slovenia",	4738,	9851.0],
-        ["Spain",	2775,	129759.0],
-        ["Sweden",	2050,	20701.0],
-        ["Switzerland",	5203,	45026.0],
-        ["Ukraine",	1697,	74242.0],
-        ["United Kingdom",	2547,	172915.0],
-        
-    ]);
+    
+    const rows = Object.entries(realData).map( ([country, countryData]) => {
+        const latestData = countryData.map(xs => xs[xs.length - 1]);
+        return [country, latestData[0], latestData[2]];
+    });
+    console.log(rows[0]);
+    data.addRows(rows);
     return data;
 }
 
@@ -90,52 +43,52 @@ function drawChart() {
     data = getData();
     drawMap(data);
     drawTable(data);
-    drawLineGraph();
+    drawDummyLineGraph();
 }
 
 
-function updateLineGraph(country, newData){
+// format data for line graph for selected countries  and provided country data
+function formatLinegraphData(){
+    result  = [["Monday"], ["Tuesday"], ["Wednesday"], ["Thursday"], ["Friday"], ["Saturday"], ["Sunday"]];
+countries.forEach(country => {
+countryData = realData[country][0];
+if(countryData == null){
+    countryData = [5784, 4096, 3817, 4935, 5839, 6653, 6602];
+} 
+result.forEach((dayList, i) => {
+dayList.push(countryData[i]);
+});
+});
+return result;
+}
 
-    // update the data for the row depending on the status of the line graph
+function updateLineGraph(country){
 
-    // if no country has been clicked yet
-    if(countries.length == 0) {
-        countries.push(country)
-        for(var i=0; i< linegraphData.length; i++) {
-            linegraphData[i][1] = newData[i];
-        }
-    }
-
-    // if only one country has been clicked
-    else if(countries.length == 1){
+    // if country not in countries then add it, otherwise remove it
+    if(countries.includes(country)) {
+        countries = countries.filter(c => c != country);
+    } else {
         countries.push(country);
-        for(var i=0; i< linegraphData.length; i++) {
-            linegraphData[i].push(newData[i]);
-        }
     }
 
-    // if two countries have already been selected
-    else {
-        countries.shift(); // remove first country
-        countries.push(country);
-        for(var i=0; i< linegraphData.length; i++) {
-            linegraphData[i].splice(1,1);
-            linegraphData[i].push(newData[i]);
-        }
+    //if no countries selected, just draw dummy line graph
+    if(countries.length == 0){
+        drawDummyLineGraph();
+        return;
     }
-
-
+    
+    var countryData = formatLinegraphData();
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Day of the Week');
     for(var i=0; i<countries.length; i++) {
         data.addColumn('number', countries[i]);
     }
 
-    data.addRows(linegraphData);
+    data.addRows(countryData);
 
     var options = {
         chart: {
-            title: 'Daily Reported Cases in Countries',
+            title: 'Daily Reported Cases in Countries per Million',
             subtitle: 'For week 09/11/2020 - 15/11/2020'
         },
         crosshair:{ 
@@ -152,13 +105,13 @@ function updateLineGraph(country, newData){
 
 }
 
-function drawLineGraph() {
+function drawDummyLineGraph() {
     var data = new google.visualization.DataTable();
       data.addColumn('string', 'Day of the Week');
       data.addColumn('number', 'None');
       
 
-      data.addRows(linegraphData);
+      data.addRows(dummyLinegraphData);
 
       var options = {
         chart: {
@@ -191,25 +144,21 @@ function drawMap(data) {
     // inline function to setup the selection behaviour
     function selectHandler() {
         var selectedItem = geoChart.getSelection()[0];
-        if (selectedItem) {
-            var country = data.getValue(selectedItem.row, 0);
-            if(country == "XK"){
-                country = "Kosovo";
+        if (selectedItem == null) {
+            if(lastSelection == null) {
+                console.log("didnt expect lastSelection to be null");
+                return;
             }
-
-            d = dailyData[country];
-            if(d == null){
-                d = [5784, 4096, 3817, 4935, 5839, 6653, 6602];
-            } 
-            updateLineGraph(country, d);
-
-            /*
-            var str = '<p>' + country + ': ' + perMillion + ' new cases per million';
-            var str2 = '<br> ' + newCases + ' new cases total</p>';
-            div = document.getElementById('output');
-            div.insertAdjacentHTML('beforeend', str + str2);
-            */
+            selectedItem = lastSelection;
+        } else {
+            lastSelection = selectedItem;
         }
+        var country = data.getValue(selectedItem.row, 0);
+        if(country == "XK"){
+            country = "Kosovo";
+        }
+        updateLineGraph(country);
+
     }
 
     google.visualization.events.addListener(geoChart, 'select', selectHandler)

@@ -3,6 +3,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.8.1/dist/js/tabulator.min.js"></script>
     <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
+    <script type="text/javascript" src="data.js"></script>
     <script type='text/javascript' src="deathScript.js"></script>
   </head>
   <body>
@@ -13,37 +14,43 @@
             <a class="nav-link" role=link aria-label="home" href="index.html">Home</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link" role=link aria-label="weekly cases" href="cases.html">Weekly Cases</a>
+            <a class="nav-link active" role=link aria-label="weekly cases" href="cases.html">Weekly Cases</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link active" role=link aria-label="weekly deaths" href="deaths.html">Weekly Deaths</a>
+            <a class="nav-link" role=link aria-label="weekly deaths" href="deaths.html">Weekly Deaths</a>
             </li>
         </ul>
     </div><br>
     
 
     <div role="heading" aria-level="1">
-      <h1>Weekly Deaths - Europe</h1><br>
+        <h1>Weekly Deaths - Europe</h1><br>
     </div><br>
-  
+    
     <div>
       The following visualisation represents data from the week 09/11/2020 - 15/11/2020
     </div><br>
 
     <table class="columns" style="width:900">
-        <tr>
-          <td><div id="map_div" style="border: 1px solid #ccc; width: 600px; height: 600;"></div></td>
-          <td><div id="table_div" style="border: 1px solid #ccc; width: 600px; height: 600;"></div></td>
-        </tr>
-      </table>
+      <tr>
+        <td><div id="map_div" style="border: 1px solid #ccc; width: 600px; height: 600;"></div></td>
+        <td><div id="table_div" style="border: 1px solid #ccc; width: 500px; height: 600;"></div></td>
+      </tr>
+    </table>
+    <br>
+    <div id="linechart_material" style="width: 600px; height: 550px; margin-left: 80px"></div>
     
+
+
+    <div id="output">
+
+    </div>
+
 
     <!-- Bootstrap JS imports -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
-
 
   </body>
 </html>

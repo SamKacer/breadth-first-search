@@ -1,63 +1,38 @@
 google.charts.load('current', {
-    'packages': ['geochart', 'table'],
+    'packages': ['geochart', 'table', 'line'],
     'mapsApiKey': 'AIzaSyDfldKhiFoaTFYBAki_9qHQRyjDZvov96o'
 });
 google.charts.setOnLoadCallback(drawChart);
+
+
+var isData = false;
+var countries = [];
+// for selection handler
+var lastSelection = null;
+var dummyLinegraphData = [
+    ["Monday", 0],
+    ["Tuesday", 0],
+    ["Wednesday", 0],
+    ["Thursday", 0],
+    ["Friday", 0],
+    ["Saturday", 0],
+    ["Sunday", 0]
+]
 
 // Function that gets the data used for visualisation
 function getData() {
 
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Country');
-    data.addColumn('number', 'New Deaths (per million)');
-    data.addColumn('number', 'New Deaths');
+    data.addColumn('number', 'Deaths (per million)');
+    data.addColumn('number', 'Deaths');
 
-    // Temporarily use "fake" data
-    data.addRows([
-        ["Albania",	19.111,	55.0],
-        ["Austria",	34,	311.0],
-        ["Belarus",	3,	35.0],
-        ["Belgium",	108, 1261.0],
-        ["Bosnia and Herzegovina", 111, 367.0],
-        ["Bulgaria", 66, 459.0],
-        ["Croatia",	61,	254.0],
-        ["Cyprus",	13,	12.0],
-        ["Czech Republic",	128, 1377.0],
-        ["Denmark",	2, 17.0],
-        ["Estonia",	5, 7.0],
-        ["Faroe Islands", 0, 0.0],
-        ["Finland",	1,	7.0],
-        ["France",	62,	4077.0],
-        ["Germany",	14,	1196.0],
-        ["Greece",	27,	286.0],
-        ["Hungary",	68,	659.0],
-        ["Iceland",	20,	7.0],
-        ["Ireland",	6, 33.0],
-        ["Isle of Man",	11,	1.0],
-        ["Italy", 59, 3620.0],
-        [{v: "XK", f:"Kosovo"}, 33,	65.0],
-        ["Latvia", 13, 25.0],
-        ["Lithuania", 23, 63.0],
-        ["Luxembourg", 54, 34.0],
-        ["Macedonia", 82, 171.0],
-        ["Malta",	52,	23.0],
-        ["Moldova",	28,	115.0],
-        ["Montenegro",	82,	52.0],
-        ["Netherlands",	28,	482.0],
-        ["Norway",	1,	9.0],
-        ["Poland",	63,	2409.0],
-        ["Portugal", 44,	457.0],
-        ["Romania",	53,	1020.0],
-        ["Russia",	17,	2583.0],
-        ["Serbia",	16,	109.0],
-        ["Slovakia", 29, 159.0],
-        ["Slovenia", 58, 122.0],
-        ["Spain", 41, 1936.0],
-        ["Sweden", 5, 52.0],
-        ["Switzerland",	63,	552.0],
-        ["Ukraine",	27,	1196.0],
-        ["United Kingdom",	42,	2878.0]
-    ]);
+    
+    const rows = Object.entries(realData).map( ([country, countryData]) => {
+        const cumulativeData = countryData.map(xs => xs.reduce( (x,y) => x+y));
+        return [country, cumulativeData[1], cumulativeData[3]];
+    });
+    data.addRows(rows);
     return data;
 }
 
@@ -67,39 +42,148 @@ function drawChart() {
     data = getData();
     drawMap(data);
     drawTable(data);
+    drawDummyLineGraph();
 }
+
+
+// format data for line graph for selected countries  and provided country data
+function formatLinegraphData(){
+    result  = [["Monday"], ["Tuesday"], ["Wednesday"], ["Thursday"], ["Friday"], ["Saturday"], ["Sunday"]];
+countries.forEach(country => {
+countryData = realData[country][1];
+if(countryData == null){
+    countryData = [5784, 4096, 3817, 4935, 5839, 6653, 6602];
+} 
+result.forEach((dayList, i) => {
+dayList.push(countryData[i]);
+});
+});
+return result;
+}
+
+function updateLineGraph(country){
+
+    // if country not in countries then add it, otherwise remove it
+    if(countries.includes(country)) {
+        countries = countries.filter(c => c != country);
+    } else {
+        countries.push(country);
+    }
+
+    //if no countries selected, just draw dummy line graph
+    if(countries.length == 0){
+        drawDummyLineGraph();
+        return;
+    }
+    
+    var countryData = formatLinegraphData();
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Day of the Week');
+    for(var i=0; i<countries.length; i++) {
+        data.addColumn('number', countries[i]);
+    }
+
+    data.addRows(countryData);
+
+    var options = {
+        chart: {
+            title: 'Daily Reported Deaths in Countries per Million',
+            subtitle: 'For week 09/11/2020 - 15/11/2020'
+        },
+        crosshair:{ 
+            trigger: "both",
+            orientation: 'vertical' 
+        },
+        width: 900,
+        height: 500
+    };
+
+    var chart = new google.charts.Line(document.getElementById('linechart_material'));
+
+    chart.draw(data, google.charts.Line.convertOptions(options));
+
+}
+
+function drawDummyLineGraph() {
+    var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Day of the Week');
+      data.addColumn('number', 'None');
+      
+
+      data.addRows(dummyLinegraphData);
+
+      var options = {
+        chart: {
+          title: 'Daily Reported Deaths in Countries',
+          subtitle: 'For week 09/11/2020 - 15/11/2020'
+        },
+        crosshair:{ 
+            trigger: "both",
+            orientation: 'vertical' 
+        },
+        width: 900,
+        height: 500
+      };
+
+      var chart = new google.charts.Line(document.getElementById('linechart_material'));
+
+      chart.draw(data, google.charts.Line.convertOptions(options));
+  }
+
 
 // helper function used to draw map
 function drawMap(data) {
     var map_options = {
         region: 150,
-        colorAxis: {colors: ['ffdb00', 'ffa904', 'ee7b06'],
-        
-        }
+        colorAxis: {colors: ['ffdb00', 'ffa904', 'ee7b06']}
     };
     var geoChart = new google.visualization.GeoChart(document.getElementById('map_div'));
+    
+
+    // inline function to setup the selection behaviour
+    function selectHandler() {
+        var selectedItem = geoChart.getSelection()[0];
+        if (selectedItem == null) {
+            if(lastSelection == null) {
+                console.log("didnt expect lastSelection to be null");
+                return;
+            }
+            selectedItem = lastSelection;
+        } else {
+            lastSelection = selectedItem;
+        }
+        var country = data.getValue(selectedItem.row, 0);
+        if(country == "XK"){
+            country = "Kosovo";
+        }
+        updateLineGraph(country);
+
+    }
+
+    google.visualization.events.addListener(geoChart, 'select', selectHandler)
     geoChart.draw(data, map_options);
 }
 
+// function to display the data in a tabular format
 function createTable(tableData) {
     var table = document.createElement('table');
     var tableBody = document.createElement('tbody');
   
     tableData.forEach(function(rowData) {
-      var row = document.createElement('tr');
-  
-      rowData.forEach(function(cellData) {
-        var cell = document.createElement('td');
-        cell.appendChild(document.createTextNode(cellData));
-        row.appendChild(cell);
-      });
-  
-      tableBody.appendChild(row);
+        var row = document.createElement('tr');
+
+        rowData.forEach(function(cellData) {
+            var cell = document.createElement('td');
+            cell.appendChild(document.createTextNode(cellData));
+            row.appendChild(cell);
+        });
+
+        tableBody.appendChild(row);
     });
   
     table.appendChild(tableBody);
     document.body.appendChild(table);
-  }
+}
 
 
 // helper function to fraw table

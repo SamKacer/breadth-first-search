@@ -29,8 +29,8 @@ function getData() {
 
     
     const rows = Object.entries(realData).map( ([country, countryData]) => {
-        const latestData = countryData.map(xs => xs[xs.length - 1]);
-        return [country, latestData[0], latestData[2]];
+        const cumulativeData = countryData.map(xs => xs.reduce( (x,y) => x+y));
+        return [country, cumulativeData[0], cumulativeData[2]];
     });
     console.log(rows[0]);
     data.addRows(rows);
